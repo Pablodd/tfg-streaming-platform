@@ -50,3 +50,29 @@ resource "google_compute_firewall" "allow_ssh_iap" {
 
   source_ranges = ["35.235.240.0/20"]
 }
+
+#Red para srt-relay
+resource "google_compute_address" "srt_relay_static_ip" {
+  name   = "srt-relay-static-ip"
+  region = "europe-southwest1"
+}
+
+#Regla para firewall
+
+resource "google_compute_firewall" "permitir_srt_relay" {
+  name    = "permitir-srt-relay"
+  network = google_compute_network.red_stream_tfg.name # Ajusta al nombre de tu red
+
+  allow {
+    protocol = "udp"
+    ports    = ["10080"]
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["1935", "1985", "8080"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["srt-server"]
+}
