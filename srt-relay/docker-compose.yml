@@ -1,0 +1,13 @@
+services:
+  srt-relay:
+    image: ossrs/srs:5
+    container_name: srt-relay-srs
+    ports:
+      - "1935:1935"
+      - "1985:1985"
+      - "8080:8080"
+      - "10080:10080/udp"
+    volumes:
+      - ./srs-tfg.conf:/usr/local/srs/conf/srs-tfg.conf
+    command: ./objs/srs -c conf/srs-tfg.conf
+    restart: always
