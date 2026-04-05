@@ -1,0 +1,3 @@
+NAME                ADDRESS/RANGE   TYPE      PURPOSE  NETWORK  REGION             SUBNET  STATUS
+ip-cdn-publica      34.8.142.83     EXTERNAL                                               IN_USE
+ip-servidor-stream  34.175.126.212  EXTERNAL                    europe-southwest1          IN_USE

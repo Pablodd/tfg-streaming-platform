@@ -1,0 +1,2 @@
+   SERVICE         REGION             URL                                                            LAST DEPLOYED BY           LAST DEPLOYED AT
+[32m✔[39;0m  portal-web-tfg  europe-southwest1  https://portal-web-tfg-148909849620.europe-southwest1.run.app  pablo.perez92@hotmail.com  2026-04-04T14:15:00.194110Z

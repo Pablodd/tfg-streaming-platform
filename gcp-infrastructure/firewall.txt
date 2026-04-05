@@ -1,0 +1,8 @@
+NAME                        NETWORK         DIRECTION  PRIORITY  ALLOW           DENY  DISABLED
+allow-http-streaming        red-stream-tfg  INGRESS    1000      tcp:80                False
+permitir-rtmp               red-stream-tfg  INGRESS    1000      tcp:1935              False
+permitir-ssh-google-iap     red-stream-tfg  INGRESS    1000      tcp:22                False
+permitir-ssh-interno        red-stream-tfg  INGRESS    1000      tcp:22                False
+permitir-web                red-stream-tfg  INGRESS    1000      tcp:80,tcp:443        False
+red-stream-tfg-allow-http   red-stream-tfg  INGRESS    1000      tcp:80                False
+red-stream-tfg-allow-https  red-stream-tfg  INGRESS    1000      tcp:443               False
