@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Streaming TFG - Control Panel</title>
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #eceff1; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        #status-banner { padding: 15px; margin-bottom: 20px; border-radius: 8px; font-weight: bold; font-size: 1.2em; transition: 0.3s; }
+        .online { background: #4caf50; color: white; }
+        .offline { background: #f44336; color: white; }
+        .debug-box { background: #333; color: #0f0; padding: 10px; margin-top: 20px; text-align: left; font-family: monospace; font-size: 12px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📡 Plataforma de Streaming TFG</h1>
+        
+        <div id="status-banner" class="offline">ESTADO: DESCONECTADO</div>
+
+        <div class="video-wrapper">
+            <video id="my-video" class="video-js vjs-big-play-centered vjs-16-9" controls preload="auto">
+                <p class="vjs-no-js">Habilita JavaScript para ver el vídeo.</p>
+            </video>
+        </div>
+
+        <div class="debug-box" id="debug">Iniciando sistema...</div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
+    <script>
+        const debug = document.getElementById('debug');
+        function log(msg) { debug.innerHTML += "<br>> " + msg; console.log(msg); }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQSguJidE6xgcsO9PrJiy5LFP2fHd7w4k",
+            authDomain: "stream-cloud-tfg-66624.firebaseapp.com",
+            projectId: "stream-cloud-tfg-66624",
+            storageBucket: "stream-cloud-tfg-66624.firebasestorage.app",
+            messagingSenderId: "702242304782",
+            appId: "1:702242304782:web:ff0258ef1dda4ec9dbdd5f"
+        };
+
+        // 1. Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        log("Firebase inicializado");
+
+        // 2. Conectar a la base de datos específica (db-streaming)
+        // Si al final usas la "(default)", quita lo que hay dentro de los paréntesis
+        const db = firebase.app().firestore("db-streaming"); 
+        
+        var player = videojs('my-video', {
+            html5: {
+                vhs: {
+                    overrideNative: true,
+                    proxyUrl: function(url) {
+                        // Esto añade el timestamp solo si es necesario, 
+                        // sin romper la lógica de los fragmentos .ts
+                        return url; 
+                    }
+                }
+            }
+        });
+        const banner = document.getElementById('status-banner');
+
+        // 3. Escuchar cambios
+        db.collection("metadata").doc("current_stream")
+            .onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    log("Datos recibidos de Firestore: " + JSON.stringify(data));
+
+                    if (data.status === "online") {
+                        banner.innerText = "● EN DIRECTO";
+                        banner.className = "online";
+                        
+                        // Creamos una URL única usando el timestamp para romper la caché de la CDN
+                        const freshUrl = data.url + "?v=" + Date.now();
+                        log("Cargando versión fresca: " + freshUrl);
+                        
+                        // Solo actualizamos si la URL base ha cambiado o el reproductor estaba vacío
+                        // Usamos freshUrl para asegurar que no cargue fragmentos antiguos
+                        player.src({ 
+                            type: 'application/x-mpegURL', 
+                            src: freshUrl 
+                        });
+                        
+                        player.play().catch(error => {
+                            log("Aviso: El auto-play requiere interacción del usuario.");
+                        });
+
+                    } else {
+                        banner.innerText = "DIRECTO FINALIZADO / OFFLINE";
+                        banner.className = "offline";
+                        player.reset();
+                        log("Streaming parado por el administrador.");
+                    }
+
+                } else {
+                    log("ERROR: No se encuentra el documento 'current_stream' en la colección 'metadata'");
+                }
+            }, (error) => {
+                log("ERROR DE CONEXIÓN: " + error.message);
+            });
+    </script>
+</body>
+</html>
