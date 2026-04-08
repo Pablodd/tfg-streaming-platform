@@ -76,7 +76,7 @@
                     log("Datos recibidos de Firestore: " + JSON.stringify(data));
 
                     if (data.status === "online") {
-                        banner.innerText = "● EN DIRECTO";
+                        banner.innerText = "● EN DIRECTO __";
                         banner.className = "online";
                         
                         // Creamos una URL única usando el timestamp para romper la caché de la CDN
