@@ -1,0 +1,1 @@
+docker run -d --name /mariadb-tfg -p 3306:3306 -e MARIADB_DATABASE=streaming_db -e MARIADB_ROOT_PASSWORD=1234 -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin -e GOSU_VERSION=1.19 -e LANG=C.UTF-8 -e MARIADB_VERSION=1:12.2.2+maria~ubu2404  mariadb:latest

@@ -147,3 +147,44 @@ resource "google_compute_instance" "srt_relay_vm" {
     EOT
   }
 }
+
+# La instancia de Base de Datos (MariaDB)
+resource "google_compute_instance" "db_server" {
+  name         = "db-server-tfg"
+  machine_type = "e2-micro"
+  zone         = "europe-southwest1-a"
+  tags         = ["db-server"]
+
+  boot_disk {
+    initialize_params { 
+      image = "debian-cloud/debian-11" 
+      size  = 30
+    }
+  }
+
+  network_interface {
+    network    = "red-stream-tfg"
+    subnetwork = "subred-madrid"
+    network_ip = "10.0.1.7" # Forzamos la IP interna que ya tienes
+    access_config {
+      # Esto le da IP pública para que puedas entrar por SSH
+    }
+  }
+
+  metadata = {
+    startup-script = <<-EOT
+      #!/bin/bash
+      apt-get update && apt-get install -y docker.io
+      systemctl enable --now docker
+
+      # Lanzar el contenedor de MariaDB automáticamente
+      # IMPORTANTE: Cambia 'streaming_db' por tu contraseña real
+      docker run -d --name mariadb-tfg \
+        -p 3306:3306 \
+        -e MARIADB_ROOT_PASSWORD=streaming_db \
+        -e MARIADB_DATABASE=streaming_platform \
+        --restart always \
+        mariadb:latest
+    EOT
+  }
+}
