@@ -1,11 +1,11 @@
 steps:
-  # 1. Construir la imagen de Docker apuntando a la subcarpeta
+  # 1. Construir la imagen de Docker
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build', 
       '-t', 'gcr.io/$PROJECT_ID/portal-web-tfg:$COMMIT_SHA', 
-      '-f', 'cloud-run-frontend/portal-web/Dockerfile', # <--- Ruta al Dockerfile
-      'cloud-run-frontend/portal-web/' # <--- Contexto de la carpeta
+      '-f', 'cloud-run-frontend/portal-web/Dockerfile',
+      'cloud-run-frontend/portal-web/'
     ]
 
   # 2. Empujar la imagen
